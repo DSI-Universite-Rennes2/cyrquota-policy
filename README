@@ -1,27 +1,30 @@
 Cyrus Quota Check
-Version: 0.1
-Author: Sylvain Costard - Université Rennes 2
-URL : https://github.com/bb2k/cyrquota-policy 
+-----------------
+
+**Version**: 0.1
+**Author**: Sylvain Costard - Université Rennes 2
+**URL**: https://github.com/bb2k/cyrquota-policy 
 
 This is a translation in python of Postfix quota integration perl script written by Omni Flux (http://www.omniflux.com/devel/)
 It tries to return to overquota status of a cyrus box as fast as possible. That's why i integrated a cache system in the code.
 
-Usage : 
+**Usage** : 
   cyrquota-policy.py
 
-Limitation :
+**Limitation** :
   This method will not catch overquota accounts if postfix
   rewrites the address before performing local delivery
   (aliases, virtual domains).
 
 Logging is sent to syslogd.
 
-Installing :
+**Installing** :
 
 You need python flask library
 
 To install it under ubuntu :
-  apt-get install python-flask
+
+    apt-get install python-flask
 
 To run this from /etc/postfix/master.cf:
 
@@ -41,7 +44,7 @@ To run this from /etc/postfix/master.cf:
 This policy should be included after reject_unlisted_recipient if used,
 but before any permit rules or maps which return OK.
 
-Testing :
+**Testing** :
 
 To test this script by hand, execute:
 
@@ -58,7 +61,3 @@ attribute list followed by a empty line:
 
     action=dunno
     [empty line]
-
-
-
-
