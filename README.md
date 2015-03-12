@@ -1,23 +1,27 @@
 Cyrus Quota Check
 -----------------
 
-**Version**: 
-  0.1
-**Author**:
-  Sylvain Costard - Université Rennes 2
-**URL**:
-  https://github.com/bb2k/cyrquota-policy 
+**Version**:   0.1
+
+**Author** :   Sylvain Costard - Université Rennes 2
+  
+**URL**: https://github.com/bb2k/cyrquota-policy 
+
 
 This is a translation in python of Postfix quota integration perl script written by Omni Flux (http://www.omniflux.com/devel/)
 It tries to return to overquota status of a cyrus box as fast as possible. That's why i integrated a cache system in the code.
 
 **Usage** : 
-  cyrquota-policy.py
+
+cyrquota-policy.py
 
 **Limitation** :
-  This method will not catch overquota accounts if postfix
-  rewrites the address before performing local delivery
-  (aliases, virtual domains).
+
+This method will not catch overquota accounts if postfix
+rewrites the address before performing local delivery
+(aliases, virtual domains).
+
+**Logs** : 
 
 Logging is sent to syslogd.
 
