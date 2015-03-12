@@ -65,8 +65,11 @@ def getAccount(mail):
 
 
 def domain(mail):
-  (alias,domain) = mail.split("@")
-  return domain
+  if mail.find("@") > 0 :
+    (alias,domain) = mail.split("@")
+    return domain
+  else :
+    return mail
 
 
 def alias(mail):
