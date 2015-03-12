@@ -118,8 +118,7 @@ while 1:
       if domain(attr['recipient']).lower() == mydomain.lower():
 
         quotaResult = quotaCache.get(alias(recipient))
-        quotaResult = None
-
+       
         if quotaResult is None:
           
           s.send(netstring.encode("0 " + alias(recipient)))
