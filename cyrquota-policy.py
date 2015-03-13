@@ -35,7 +35,7 @@ from werkzeug.contrib.cache import SimpleCache
 
 # Site specific details
 #
-mydomain = 'etudiant.univ-haute-bretagne.fr';
+mydomains = {'xxx.fr','yyy.fr'};
 aliasFile = '/etc/aliases';
 
 #
@@ -80,6 +80,7 @@ def alias(mail):
     return mail
 
 attr={}
+cached =  ""
 
 # netstring decoder
 decoder = netstring.Decoder()
@@ -105,36 +106,41 @@ while 1:
       syslog.syslog("Ignoring Garbage : " + chaine)
       continue
 
-    
     if 'request' in attr and attr['request'] != 'smtpd_access_policy':
       syslog.syslog("Error : Bad Request : " + command)
-      sys.exit(0)
-    
-    quotaResult = "action="+default_response   
-    
+      sys.exit("Bad request")
+
+    quotaResult = "action="+default_response
+
     if 'recipient' in attr:
-      recipient = getAccount(alias(attr['recipient'])) 
+      recipient = getAccount(alias(attr['recipient']))
 
-      if domain(attr['recipient']).lower() == mydomain.lower():
-
+      if domain(attr['recipient']).lower() in mydomains:
         quotaResult = quotaCache.get(alias(recipient))
-       
+        cached      = " (from cache)"
+
         if quotaResult is None:
-          
+          cached = " "
           s.send(netstring.encode("0 " + alias(recipient)))
- 
           data = s.recv(1024)
-          if not data: break
+
+          if not data:
+            syslog.syslog("No data received")
+            break
+
           for packet in decoder.feed(data):
             if packet.find("Over quota") >= 0 :
-		quotaResult = "action="+overquota_response
+                quotaResult = "action="+overquota_response
             else :
-		quotaResult = "action="+default_response
-	    quotaCache.set(value, quotaResult, timeout=5 * 60)
-      else :
-	syslog.syslog ("Skipping external domain: " + domain(recipient).lower()) 
-        
+                quotaResult = "action="+default_response
+            quotaCache.set(value, quotaResult, timeout=5 * 60)
 
+      else :
+        syslog.syslog ("Skipping external domain: " + domain(recipient).lower())
+
+    syslog.syslog ("cyrquota-policy response: "+ recipient + " " + quotaResult + cached)
     sys.stdout.write(quotaResult + '\n\n')
-    attr={}
+
+    attr   = {}
     break
+ 
