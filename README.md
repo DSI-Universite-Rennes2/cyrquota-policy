@@ -36,7 +36,7 @@ To install it under ubuntu :
 To run this from /etc/postfix/master.cf:
 
     cyrquota-policy	unix	-	n	n	-	-	spawn
-       user=nobody argv=/usr/bin/perl /usr/local/sbin/cyrquota-policy.py
+       user=nobody argv=/usr/bin/python /usr/local/sbin/cyrquota-policy.py
 
  To use this from Postfix SMTPD, use in /etc/postfix/main.cf:
 
