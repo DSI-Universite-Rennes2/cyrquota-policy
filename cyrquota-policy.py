@@ -30,7 +30,7 @@ import socket,sys
 import netstring
 import subprocess
 import syslog
-from werkzeug.contrib.cache import SimpleCache
+#from werkzeug.contrib.cache import SimpleCache
 
 
 # Site specific details
@@ -89,58 +89,58 @@ decoder = netstring.Decoder()
 accountCache = SimpleCache()
 quotaCache   = SimpleCache()
 
-s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-s.connect(socketFile)
-
 # syslog init
 syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_MAIL)
 
 while 1:
     chaine = sys.stdin.readline().rstrip()
+   # syslog.syslog("received : " + chaine)
 
     if chaine.find("=") > 0 :
-      (command,value) = chaine.split("=")
+      (command,value) = chaine.split("=",1)
       attr[command] = value
       continue
-    elif chaine is not '' : 
+    elif chaine is not '' :
       syslog.syslog("Ignoring Garbage : " + chaine)
       continue
+    else:
+      break
 
-    if 'request' in attr and attr['request'] != 'smtpd_access_policy':
-      syslog.syslog("Error : Bad Request : " + command)
-      sys.exit("Bad request")
+
+if 'request' in attr and attr['request'] != 'smtpd_access_policy':
+    syslog.syslog("Error : Bad Request : " + command)
+    sys.exit("Bad request")
 
     quotaResult = "action="+default_response
 
-    if 'recipient' in attr:
-      recipient = getAccount(alias(attr['recipient']))
+if 'recipient' in attr:
+  recipient = getAccount(alias(attr['recipient']))
 
-      if domain(attr['recipient']).lower() in mydomains:
-        quotaResult = quotaCache.get(alias(recipient))
-        cached      = " (from cache)"
+  if domain(attr['recipient']).lower() in mydomains:
+    quotaResult = quotaCache.get(alias(recipient))
+    cached      = " (from cache)"
 
-        if quotaResult is None:
-          cached = " "
-          s.send(netstring.encode("0 " + alias(recipient)))
-          data = s.recv(1024)
+    if quotaResult is None:
+      cached = " "
+      s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+      s.connect(socketFile)
+      s.send(netstring.encode("0 " + alias(recipient)))
+      data = s.recv(1024)
 
-          if not data:
-            syslog.syslog("No data received")
-            break
+      if not data:
+        syslog.syslog("No data received")
+        sys.exit("No data received")
 
-          for packet in decoder.feed(data):
-            if packet.find("Over quota") >= 0 :
-                quotaResult = "action="+overquota_response
-            else :
-                quotaResult = "action="+default_response
-            quotaCache.set(value, quotaResult, timeout=5 * 60)
+      for packet in decoder.feed(data):
+        if packet.find("Over quota") >= 0 :
+          quotaResult = "action="+overquota_response
+        else :
+          quotaResult = "action="+default_response
+        quotaCache.set(value, quotaResult, timeout=5 * 60)
 
-      else :
-        syslog.syslog ("Skipping external domain: " + domain(recipient).lower())
+  else :
+    syslog.syslog ("Skipping external domain: " + domain(recipient).lower())
 
-    syslog.syslog ("cyrquota-policy response: "+ recipient + " " + quotaResult + cached)
-    sys.stdout.write(quotaResult + '\n\n')
+  syslog.syslog ("cyrquota-policy response: "+ recipient + " " + quotaResult + cached)
+  sys.stdout.write(quotaResult + '\n\n')
 
-    attr   = {}
-    break
- 
