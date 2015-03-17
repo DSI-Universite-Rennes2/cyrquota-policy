@@ -9,7 +9,7 @@ Cyrus Quota Check
 
 
 This is a translation in python of Postfix quota integration perl script written by Omni Flux (http://www.omniflux.com/devel/)
-It tries to return to overquota status of a cyrus box as fast as possible. That's why i integrated a cache system in the code.
+It tries to return to overquota status of a cyrus box as fast as possible. 
 
 **Usage** : 
 
