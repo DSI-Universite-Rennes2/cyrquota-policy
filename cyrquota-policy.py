@@ -30,7 +30,6 @@ import socket,sys
 import netstring
 import subprocess
 import syslog
-#from werkzeug.contrib.cache import SimpleCache
 
 
 # Site specific details
@@ -52,14 +51,11 @@ socketFile = "/var/run/cyrus/socket/smmap";
 
 # retourne le compte correspondant à l'alias
 def getAccount(mail):
-  result = accountCache.get(mail)
-  if result is None:
-    try: 
+  try: 
       line = subprocess.check_output(['grep', "^"+mail+":", aliasFile])
       account = line.split(": ")  
       result = account[1].rstrip()
-      accountCache.set(mail, result, timeout=5 * 60)
-    except:
+  except:
       return mail
   return result
 
@@ -84,10 +80,6 @@ cached =  ""
 
 # netstring decoder
 decoder = netstring.Decoder()
-
-# cache initialization
-accountCache = SimpleCache()
-quotaCache   = SimpleCache()
 
 # syslog init
 syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_MAIL)
@@ -117,11 +109,6 @@ if 'recipient' in attr:
   recipient = getAccount(alias(attr['recipient']))
 
   if domain(attr['recipient']).lower() in mydomains:
-    quotaResult = quotaCache.get(alias(recipient))
-    cached      = " (from cache)"
-
-    if quotaResult is None:
-      cached = " "
       s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
       s.connect(socketFile)
       s.send(netstring.encode("0 " + alias(recipient)))
@@ -136,11 +123,9 @@ if 'recipient' in attr:
           quotaResult = "action="+overquota_response
         else :
           quotaResult = "action="+default_response
-        quotaCache.set(value, quotaResult, timeout=5 * 60)
-
   else :
     syslog.syslog ("Skipping external domain: " + domain(recipient).lower())
 
-  syslog.syslog ("cyrquota-policy response: "+ recipient + " " + quotaResult + cached)
+  syslog.syslog ("cyrquota-policy response: "+ recipient + " " + quotaResult )
   sys.stdout.write(quotaResult + '\n\n')
 
