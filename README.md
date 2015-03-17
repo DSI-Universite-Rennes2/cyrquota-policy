@@ -1,7 +1,7 @@
 Cyrus Quota Check
 -----------------
 
-**Version**:   0.1
+**Version**:   0.3
 
 **Author** :   Sylvain Costard - Université Rennes 2
   
