@@ -27,11 +27,6 @@ Logging is sent to syslogd.
 
 **Installing** :
 
-You need python flask library
-
-To install it under ubuntu :
-
-    apt-get install python-flask
 
 To run this from /etc/postfix/master.cf:
 
