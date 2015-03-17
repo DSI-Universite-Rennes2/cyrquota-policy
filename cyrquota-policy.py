@@ -103,7 +103,7 @@ if 'request' in attr and attr['request'] != 'smtpd_access_policy':
     syslog.syslog("Error : Bad Request : " + command)
     sys.exit("Bad request")
 
-    quotaResult = "action="+default_response
+quotaResult = "action="+default_response
 
 if 'recipient' in attr:
   recipient = getAccount(alias(attr['recipient']))
