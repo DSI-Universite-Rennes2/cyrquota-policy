@@ -5,7 +5,7 @@ Cyrus Quota Check
 
 **Author** :   Sylvain Costard - Université Rennes 2
   
-**URL**: https://github.com/bb2k/cyrquota-policy 
+**URL**: https://github.com/DSI-Universite-Rennes2/cyrquota-policy 
 
 
 This is a translation in python of Postfix quota integration perl script written by Omni Flux (http://www.omniflux.com/devel/)
